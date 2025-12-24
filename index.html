@@ -821,6 +821,7 @@ function drawStars() {
       // music
       let music_url = "http://music.163.com/song/media/outer/url?id=1892513656.mp3";
       let _music = new Audio(music_url);
+      
       window.onclick = function() {
         if(init_flag) return;
         init_flag = true;
@@ -835,6 +836,77 @@ function drawStars() {
         gsap.globalTimeline.timeScale(1.5); //  圣诞树开始绘画时小光点动画的绘画速率，越大越快
         drawStars();
       }
+// 封装点击/触摸处理函数
+function handleGlobalClick(e) {
+  // 阻止事件冒泡和默认行为（如页面滚动）
+  e.preventDefault();
+  e.stopPropagation();
+
+  if(init_flag) return;
+        init_flag = true;
+        _music.play();
+        init();
+        let mask = document.getElementById("mask");
+        mask.remove();
+        createParticles()
+        drawStar();
+        drawMain();
+        mainTl.add(starTl, 0);
+        gsap.globalTimeline.timeScale(1.5); //  圣诞树开始绘画时小光点动画的绘画速率，越大越快
+        drawStars();
+
+}
+
+// 防重复触发标记
+let isProcessing = false;
+
+// 触摸结束事件处理（手机端核心）
+function handleTouchEnd(e) {
+  if (isProcessing) return;
+  isProcessing = true;
+  handleGlobalClick(e);
+  // 延迟释放标记，防止重复触发
+  setTimeout(() => {
+    isProcessing = false;
+  }, 300);
+}
+
+// 点击事件处理（PC 端）
+function handleClick(e) {
+  if (isProcessing) return;
+  isProcessing = true;
+  handleGlobalClick(e);
+  setTimeout(() => {
+    isProcessing = false;
+  }, 300);
+}
+
+// 绑定全局事件（兼容 PC + 手机）
+function bindGlobalEvents() {
+  // 手机端触摸事件（优先使用 touchend，避免 touchstart 触发过早）
+  window.addEventListener('touchend', handleTouchEnd, false);
+  // PC 端点击事件
+  window.addEventListener('click', handleClick, false);
+}
+
+// 页面加载完成后绑定事件
+window.addEventListener('DOMContentLoaded', () => {
+  bindGlobalEvents();
+  
+  // 原有逻辑：比如初始化 mask 点击
+  const mask = document.getElementById('mask');
+  if (mask) {
+    // 兼容 mask 元素的点击/触摸
+    mask.addEventListener('touchend', handleTouchEnd, false);
+    mask.addEventListener('click', handleClick, false);
+  }
+});
+
+// 可选：移除事件（如需销毁）
+function unbindGlobalEvents() {
+  window.removeEventListener('touchend', handleTouchEnd);
+  window.removeEventListener('click', handleClick);
+}
   
   </script>
 </html>
