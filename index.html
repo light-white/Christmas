@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Merry Christmas</title>
     <style>
       body {
@@ -66,16 +67,72 @@
       }
       #mask {
         position: absolute;
+        top: 0;
+        left: 0;
         background-color: #000;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         font-size: 15rem;
         animation: shack 0.4s ease-in-out infinite;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        will-change: transform;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
         /* display: none; */
+      }
+
+      /* wrapper to ensure perfect centering for icon + hint */
+      .mask-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+      }
+      .mask-icon {
+        display: inline-block;
+        line-height: 1;
+      }
+      /* hint default for desktop: placed just under the icon */
+      .mask-hint {
+        color: #fff;
+        font-size: 1.2rem;
+        opacity: 0.95;
+        background: rgba(0,0,0,0.18);
+        padding: 6px 10px;
+        border-radius: 6px;
+        -webkit-user-select: none;
+        user-select: none;
+        pointer-events: none;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        text-align: center;
+        margin-top: 0.6rem;
+        animation: hint-pulse 1.6s ease-in-out infinite;
+      }
+
+      /* Mobile: 使用更轻微的抖动动画并缩小图标，同时将提示改为绝对定位以避免遮挡 */
+      @media (max-width: 480px) {
+        #mask {
+          animation: shack-small 1.5s ease-in-out infinite;
+          font-size: 6rem;
+        }
+        .mask-inner {
+          gap: 0.4rem;
+        }
+        .mask-hint {
+          position: absolute;
+          top: calc(50% + 3.2rem);
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 1rem;
+          padding: 4px 8px;
+        }
       }
 
       @keyframes shack {
@@ -95,6 +152,17 @@
           transform: rotate(0);
         }
       }
+      /* 轻微抖动（移动端） */
+      @keyframes shack-small {
+        0% { transform: rotate(0); }
+        50% { transform: rotate(-3deg); }
+        100% { transform: rotate(0); }
+      }
+      @keyframes hint-pulse {
+        0% { opacity: 0.6; transform: translateY(0); }
+        50% { opacity: 1; transform: translateY(-6px); }
+        100% { opacity: 0.6; transform: translateY(0); }
+      }
       #stars {
         position: absolute;
         width: 100%;
@@ -104,7 +172,12 @@
     </style>
   </head>
   <body>
-    <div id="mask">🎄</div>
+    <div id="mask">
+      <div class="mask-inner">
+        <span class="mask-icon">🎄</span>
+        <span class="mask-hint">点击开始</span>
+      </div>
+    </div>
     <canvas id="stars"></canvas>
     <div class="main">
     <!-- partial:index.partial.html -->
