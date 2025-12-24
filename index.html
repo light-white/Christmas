@@ -759,19 +759,31 @@ function drawStars() {
       // music
       let music_url = "http://music.163.com/song/media/outer/url?id=1892513656.mp3";
       let _music = new Audio(music_url);
-      window.onclick = function() {
-        if(init_flag) return;
+      function startApp(e) {
+        if (init_flag) return;
         init_flag = true;
-        _music.play();
+        // iOS 可能要求在用户手势事件中直接触发播放，忽略 play 的拒绝以避免控制台报错
+        _music.play().catch(() => {});
         init();
         let mask = document.getElementById("mask");
-        mask.remove();
-        createParticles()
+        if (mask) mask.remove();
+        createParticles();
         drawStar();
         drawMain();
         mainTl.add(starTl, 0);
         gsap.globalTimeline.timeScale(1.5); //  圣诞树开始绘画时小光点动画的绘画速率，越大越快
         drawStars();
+      }
+      // 支持 click / touch / pointer 事件以兼容 iPhone
+      window.addEventListener('click', startApp, { passive: true });
+      window.addEventListener('touchstart', startApp, { passive: true });
+      window.addEventListener('pointerdown', startApp, { passive: true });
+      // 也在遮罩元素上绑定一次，确保用户点击遮罩能被捕获
+      var maskEl = document.getElementById('mask');
+      if (maskEl) {
+        maskEl.addEventListener('click', startApp, { passive: true });
+        maskEl.addEventListener('touchstart', startApp, { passive: true });
+        maskEl.addEventListener('pointerdown', startApp, { passive: true });
       }
   
   </script>
